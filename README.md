@@ -23,7 +23,7 @@ I don't recomend relying on it, and compying the generated passowrds into a pass
 
 To generate the easy to memorize password, the hash is as a supply of random bits to generate the following:
 
-Password pattern: `(lU0!){R4nD0mW0rD}[123456]`
+Password pattern: `(lU0!){R4nD0mW0rD}[123ABC]`
 
 The password has 4 secions to it, each surrounded by one of 4 types of brackets (`()[]{}<>`):
 
@@ -31,9 +31,13 @@ The password has 4 secions to it, each surrounded by one of 4 types of brackets 
 
 `R4nD0mW0rD` a word/name picked from a list of 20K words with some characters randomly replaced with symbols or capitalized. Later the wordlist will be increased/changed to a generator.
 
-`123456` the end is a random 6-didgit number
+`123456` the end is a random hex number filling the rest of the password to 32 symbols
 
-Currently the number of possible unique passwords is `~2^60` while the recomended is `~2^100`
+The recomended strength is ~10^30 possible permutations, this password generator meets that requirement even with the worst odds.
+
+Note: right now most of the security comes from the HEX at the end, which means my "easy to memorize password generator" works due to a C&V section of HEX from the hash and due to being quite long. 
+
+> "We will need a better alg."
 
 ## Usage
 
