@@ -21,14 +21,12 @@ parse = parser = argparse.ArgumentParser(
                     prog='Password Generator',
                     description='',
                     epilog='')
-parser.add_argument("-s","--servicename", default="example.org",
+parser.add_argument("-s","--service", default="example.org",
     help="Enter the name of the Service you are planning to use the password for, be consistent with the format. eg. Paypal")
-parser.add_argument("-m","--masterpassword",required=False,
+parser.add_argument("-m","--masterpassword",
     help="Enter your master password here. Make sure to remember it.")
-parser.add_argument("-mh","--masterpasswordHash",required=False,
-    help="Enter your master password hash, passwordgen uses sha3_512")
-parser.add_argument("-pv","--preversionHash",required=False,
-    help="Enter your hash(hash(masterpassword)+service) manualty")
+parser.add_argument("-e","--extra",required=False,
+    help="Enter secondary pass phrase/password could be the login")
 parser.add_argument("-v","--version",default="001",
     help="Enter version of your password")
 parser.add_argument("-cs","--charactersets",default="lU0!",
@@ -73,7 +71,6 @@ def selectRandom(hashFeeder,startI,endI):
 
 def generateBracets(hashFeeder,charactersets):
     return charactersets["("][selectRandom(hashFeeder, 0, len(charactersets["("])-1)]
-
 
 def generateWord(hashFeeder,wordset):
     word=list(wordset[selectRandom(hashFeeder, 0, len(wordset))])
@@ -122,20 +119,20 @@ def hashfunction(bytestring,hashtype,hashlib):
     
 
 if __name__ == "__main__":
-    #hashing #TODO clean up
+    #parsing
     hashtype=arguments.hashtype
-    masterpasswordHash=arguments.masterpasswordHash
-    if masterpasswordHash==None:
-        masterpasswordHash=hashfunction(arguments.masterpassword.encode(), hashtype, hashlib)
-    else:
-        masterpasswordHash=masterpasswordHash.encode()
-    preversionHash=arguments.preversionHash
-    if preversionHash==None:
-        preversionHash=hashfunction(masterpasswordHash+arguments.servicename.encode(), hashtype, hashlib)
-    else:
-        preversionHash=preversionHash.encode()
-    rawhash=hashfunction(preversionHash+arguments.version.encode(), hashtype, hashlib).hex()
-    hashFeeder=HashFeeder(rawhash)
+    masterpassword=arguments.masterpassword.encode()
+    service=arguments.service.encode()
+    version=b"v"+int(arguments.version).to_bytes(1, byteorder="big")
+    extra=arguments.extra
+    #hashing
+    masterpasswordHash=hashfunction(masterpassword, hashtype, hashlib)
+    masterAndServiceHash=hashfunction(masterpasswordHash+service, hashtype, hashlib)
+    extraHash=b""
+    if extra!=None:
+        extraHash=hashfunction(extra.encode(), hashtype, hashlib)
+    finalHash=hashfunction(masterAndServiceHash+extraHash+version, hashtype, hashlib).hex()
+    hashFeeder=HashFeeder(finalHash)
     #Generate
     password=generatePassword(hashFeeder)
     
