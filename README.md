@@ -1,7 +1,7 @@
 # StateLess Passowrd Generator
 Alternative to [LessPass](https://www.lesspass.com/#/) and [Spectre](https://spectre.app/) password menagers.
 
-Generates easy to memorize static passwords and is intended to be used with a proper password menager like [KeePass](https://keepass.info/).
+Generates easy to short-term memorize static passwords and is intended to be used with a proper password menager like [KeePass](https://keepass.info/).
 
 ### Issues it solves
 LessPass requires you to know the login (who on earth remembers the login?) I always remember my (not so good) password and just try until I get the login right. Although LessPass is open source, I don't feel comportable feeding the login into a password generator, because if someone intercepts your connection and gets the masterpassword, they won't yet know your login.
@@ -45,4 +45,4 @@ Note: right now most of the security comes from the HEX at the end, which means 
 
 ## Credits
 
-`wordset_20K.json` was filtered from [Monkeytype](https://github.com/monkeytypegame/monkeytype) `english_25K.json`
+`elementWordList.json` was filtered from [Periodic-Table-JSON](https://github.com/Bowserinator/Periodic-Table-JSON)

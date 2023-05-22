@@ -13,8 +13,9 @@ charactersets={
 letterSwapMap={'a': '4', 'b': '8', 'c': '(', 'd': ']', 'e': '6', 'f': '=', 'g': '9', 'h': '}{', 'i': '|', 'j': '/', 'k': 'X', 'l': '_', 'm': 'w', 'n': 'M', 'o': '0', 'p': '?', 'q': ',', 'r': '&', 's': '$', 't': '7', 'u': '|_|', 'v': '\/', 'w': '#', 'x': '%', 'y': ';', 'z': '2'}
 hexString="0123456789ABCDEF"
 
+#all words are at least 8-22 long and lowercase
 wordset=[]
-with open("wordset_20K.json","r") as f:
+with open("elementWordList.json","r") as f:
     wordset=json.load(f)
 
 parse = parser = argparse.ArgumentParser(
@@ -34,6 +35,8 @@ parser.add_argument("-cs","--charactersets",default="lU0!",
 parser.add_argument("-ht","--hashtype",default="sha3_256",
     help="Enter version of your password")
 arguments = parser.parse_args()
+
+#TODO implement charactersets
 
 class HashFeeder:
     def __init__(self,hash):
@@ -73,18 +76,21 @@ def generateBracets(hashFeeder,charactersets):
     return charactersets["("][selectRandom(hashFeeder, 0, len(charactersets["("])-1)]
 
 def generateWord(hashFeeder,wordset):
-    word=list(wordset[selectRandom(hashFeeder, 0, len(wordset))])
-    for i in range(len(word)):
-        if hashFeeder.feed():
+    word=""
+    while len(word)<18:
+        addition=list(wordset[selectRandom(hashFeeder, 0, len(wordset)-1)])
+        #swap some letters
+        for i in range(len(addition)):
             if hashFeeder.feed():
-                word[i]=word[i].upper()
-            else:
-                word[i]=letterSwapMap[word[i]]
-        elif hashFeeder.feed():
-            word[i]=str(ord(word[i])-96)
-    return "".join(word)
+                addition[i]=letterSwapMap[addition[i].lower()]
+            elif len(addition)>2:
+                if hashFeeder.feed():
+                    addition[i]=addition[i].upper()
+        word+="".join(addition)
+        
+    return word[:18]
 
-def generatePassword(hashFeeder):
+def generatePassword(hashFeeder,wordset):
     password=""
     #requerment meeter
     brakets=generateBracets(hashFeeder, charactersets)
@@ -94,7 +100,7 @@ def generatePassword(hashFeeder):
     password+=charactersets["0"][selectRandom(hashFeeder, 0, len(charactersets["0"])-1)]
     password+=charactersets["!"][selectRandom(hashFeeder, 0, len(charactersets["!"])-1)]
     password+=brakets[1]
-    #word
+    #words
     brakets=generateBracets(hashFeeder, charactersets)
     password+=brakets[0]
     password+=generateWord(hashFeeder, wordset)
@@ -102,7 +108,7 @@ def generatePassword(hashFeeder):
     #number
     brakets=generateBracets(hashFeeder, charactersets)
     password+=brakets[0]
-    for i in range(len(password),31):
+    for i in range(25,31):
         password+=hexString[selectRandom(hashFeeder, 0, 15)]
     password+=brakets[1]
 
@@ -134,7 +140,7 @@ if __name__ == "__main__":
     finalHash=hashfunction(masterAndServiceHash+extraHash+version, hashtype, hashlib).hex()
     hashFeeder=HashFeeder(finalHash)
     #Generate
-    password=generatePassword(hashFeeder)
+    password=generatePassword(hashFeeder,wordset)
     
     
 
