@@ -1,0 +1,42 @@
+clipboard-timeout: 10
+default-service: example.org
+characterset: "lU0!"
+characters:
+  "l": abcdefghijklmnopqrstuvwxyz
+  "U": ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  "0": 0123456789
+  "!": |
+    !\"#$%&\'*+,-./:;=?@~^_|
+parethesis: 
+  - "()"
+  - "[]"
+  - "{}"
+  - "<>"
+letterSwapMap:
+  a: "4"
+  b: "8"
+  c: "("
+  d: "]"
+  e: "6"
+  f: "="
+  g: "9"
+  h: "}{"
+  i: "1"
+  j: "/"
+  k: "<"
+  l: "_"
+  m: "IVI"
+  n: "~"
+  o: "0"
+  p: "?"
+  q: ","
+  r: "^"
+  s: "$"
+  t: "7"
+  u: "|_|"
+  v: '\/'
+  w: "#"
+  x: "%"
+  y: ";"
+  z: "2"
+endnumbers: "0123456789ABCDEF"

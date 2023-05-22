@@ -1,17 +1,17 @@
 import argparse
 import hashlib
 import json
+import pyperclip
+import getpass
+import time
+import yaml #Put all of the preferences into yaml
 
-charactersets={
-    "l":"abcdefghijklmnopqrstuvwxyz",
-    "U":"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-    "0":"0123456789",
-    "!":"!\"#$%&\'*+,-./:;=?@~^_|",
-    "(":["()","[]","{}","<>"]
-}
+with open("config.yaml","r") as f:
+    config=yaml.safe_load(f)
 
-letterSwapMap={'a': '4', 'b': '8', 'c': '(', 'd': ']', 'e': '6', 'f': '=', 'g': '9', 'h': '}{', 'i': '|', 'j': '/', 'k': 'X', 'l': '_', 'm': 'w', 'n': 'M', 'o': '0', 'p': '?', 'q': ',', 'r': '&', 's': '$', 't': '7', 'u': '|_|', 'v': '\/', 'w': '#', 'x': '%', 'y': ';', 'z': '2'}
-hexString="0123456789ABCDEF"
+characters=config["characters"]
+letterSwapMap=config["letterSwapMap"]
+hexString=config["endnumbers"]
 
 #all words are at least 8-22 long and lowercase
 wordset=[]
@@ -22,18 +22,18 @@ parse = parser = argparse.ArgumentParser(
                     prog='Password Generator',
                     description='',
                     epilog='')
-parser.add_argument("-s","--service", default="example.org",
+parser.add_argument("-s","--service", default=config["default-service"],
     help="Enter the name of the Service you are planning to use the password for, be consistent with the format. eg. Paypal")
-parser.add_argument("-m","--masterpassword",
-    help="Enter your master password here. Make sure to remember it.")
 parser.add_argument("-e","--extra",required=False,
     help="Enter secondary pass phrase/password could be the login")
 parser.add_argument("-v","--version",default="001",
     help="Enter version of your password")
-parser.add_argument("-cs","--charactersets",default="lU0!",
+parser.add_argument("-cs","--characterset",default=config["characterset"],
     help="Enter version of your password")
 parser.add_argument("-ht","--hashtype",default="sha3_256",
     help="Enter version of your password")
+parser.add_argument("--copy",action="store_const",const=True,default=False,help="Copies password to clipboard")
+parser.add_argument("-d","--display",action="store_const",const=True,default=False,help="Displays the password in the terminal")
 arguments = parser.parse_args()
 
 #TODO implement charactersets
@@ -73,7 +73,7 @@ def selectRandom(hashFeeder,startI,endI):
         return selectRandom(hashFeeder, startI, (startI+endI-1)//2+odd)
 
 def generateBracets(hashFeeder,charactersets):
-    return charactersets["("][selectRandom(hashFeeder, 0, len(charactersets["("])-1)]
+    return config["parethesis"][selectRandom(hashFeeder, 0, len(config["parethesis"])-1)] #FIXME this part still uses config
 
 def generateWord(hashFeeder,wordset):
     word=""
@@ -90,15 +90,13 @@ def generateWord(hashFeeder,wordset):
         
     return word[:18]
 
-def generatePassword(hashFeeder,wordset):
+def generatePassword(hashFeeder,wordset,charactersets):
     password=""
     #requerment meeter
     brakets=generateBracets(hashFeeder, charactersets)
     password+=brakets[0]
-    password+=charactersets["l"][selectRandom(hashFeeder, 0, len(charactersets["l"])-1)]
-    password+=charactersets["U"][selectRandom(hashFeeder, 0, len(charactersets["U"])-1)]
-    password+=charactersets["0"][selectRandom(hashFeeder, 0, len(charactersets["0"])-1)]
-    password+=charactersets["!"][selectRandom(hashFeeder, 0, len(charactersets["!"])-1)]
+    for character in charactersets:
+        password+=characters[character][selectRandom(hashFeeder, 0, len(characters[character])-1)]
     password+=brakets[1]
     #words
     brakets=generateBracets(hashFeeder, charactersets)
@@ -113,8 +111,6 @@ def generatePassword(hashFeeder,wordset):
     password+=brakets[1]
 
     print("Password Strength:",hashFeeder.getStrength())
-    print("Password Length:",len(password))
-    print(password)
     return password
 
 def hashfunction(bytestring,hashtype,hashlib):
@@ -127,10 +123,15 @@ def hashfunction(bytestring,hashtype,hashlib):
 if __name__ == "__main__":
     #parsing
     hashtype=arguments.hashtype
-    masterpassword=arguments.masterpassword.encode()
+    masterpassword=getpass.getpass("Masterpassword:").encode()
     service=arguments.service.encode()
     version=b"v"+int(arguments.version).to_bytes(1, byteorder="big")
     extra=arguments.extra
+
+    characterset=arguments.characterset
+    display=arguments.display
+    copy=arguments.copy
+    
     #hashing
     masterpasswordHash=hashfunction(masterpassword, hashtype, hashlib)
     masterAndServiceHash=hashfunction(masterpasswordHash+service, hashtype, hashlib)
@@ -140,7 +141,16 @@ if __name__ == "__main__":
     finalHash=hashfunction(masterAndServiceHash+extraHash+version, hashtype, hashlib).hex()
     hashFeeder=HashFeeder(finalHash)
     #Generate
-    password=generatePassword(hashFeeder,wordset)
+    password=generatePassword(hashFeeder,wordset,characterset)
+
+    #Display
+    if display:
+        print(password)
+    if copy:
+        pyperclip.copy(password)
+        time.sleep(config["clipboard-timeout"]) #TODO add this into the yaml settings
+        pyperclip.copy(" ")
+        
     
     
 

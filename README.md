@@ -19,6 +19,8 @@ Also, it isn't fully standarized right now, and the exact characters and generat
 
 I don't recomend relying on it, and compying the generated passowrds into a password menager instead. I also assume that the generated hash provides a random sequence of 0s and 1s.
 
+Although I hide the masterpassword as it is being entered using `getpass` and copy the password to clipboard using `pyperclip` without printing it and overwrite the clipboard with `" "`, clipboard History apps such as Clipy will save the password. 
+
 ## Documentation
 
 To generate the easy to memorize password, the hash is as a supply of random bits to generate the following:
@@ -29,7 +31,7 @@ The password has 4 secions to it, each surrounded by one of 4 types of brackets 
 
 `lU0!` is a short seqence of a lowercase, uppercase, number and symbol characters to fullfill the password requirements most websites require.
 
-`R4nD0mW0rD` a word/name picked from a list of 20K words with some characters randomly replaced with symbols or capitalized. Later the wordlist will be increased/changed to a generator.
+`R4nD0mW0rD` is currently a concate of names&Symbols of Elements from the Periodic Table
 
 `123456` the end is a random hex number filling the rest of the password to 32 symbols
 
