@@ -1,6 +1,7 @@
 clipboard-timeout: 10
 default-service: example.org
 characterset: "lU0!"
+wordset: elementWordList.json
 characters:
   "l": abcdefghijklmnopqrstuvwxyz
   "U": ABCDEFGHIJKLMNOPQRSTUVWXYZ

@@ -15,7 +15,7 @@ hexString=config["endnumbers"]
 
 #all words are at least 8-22 long and lowercase
 wordset=[]
-with open("elementWordList.json","r") as f:
+with open(config["wordset"],"r") as f:
     wordset=json.load(f)
 
 parse = parser = argparse.ArgumentParser(
