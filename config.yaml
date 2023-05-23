@@ -1,7 +1,9 @@
+default-hashalg: sha3_256
 clipboard-timeout: 10
 default-service: example.org
 characterset: "lU0!"
-wordset: elementWordList.json
+use-word-generator: 1
+wordset: wordsets/elementWordSet.json
 characters:
   "l": abcdefghijklmnopqrstuvwxyz
   "U": ABCDEFGHIJKLMNOPQRSTUVWXYZ

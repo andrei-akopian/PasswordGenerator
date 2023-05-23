@@ -5,6 +5,7 @@ import pyperclip
 import getpass
 import time
 import yaml #Put all of the preferences into yaml
+from wordGenerator import wordGenerator
 
 with open("config.yaml","r") as f:
     config=yaml.safe_load(f)
@@ -77,18 +78,28 @@ def generateBracets(hashFeeder,charactersets):
 
 def generateWord(hashFeeder,wordset):
     word=""
-    while len(word)<18:
-        addition=list(wordset[selectRandom(hashFeeder, 0, len(wordset)-1)])
-        #swap some letters
-        for i in range(len(addition)):
-            if hashFeeder.feed():
-                addition[i]=letterSwapMap[addition[i].lower()]
-            elif len(addition)>2:
+    if config["use-word-generator"]:
+        word = list(wordGenerator.generateWord(hashFeeder, selectRandom, 18))
+        for i in range(len(word)):
                 if hashFeeder.feed():
-                    addition[i]=addition[i].upper()
-        word+="".join(addition)
-        
-    return word[:18]
+                    word[i]=letterSwapMap[word[i].lower()]
+                elif len(word)>2:
+                    if hashFeeder.feed():
+                        word[i]=word[i].upper()
+        return "".join(word[:18])  
+    else:
+        while len(word)<18:
+            addition=list(wordset[selectRandom(hashFeeder, 0, len(wordset)-1)])
+            #swap some letters
+            for i in range(len(addition)):
+                if hashFeeder.feed():
+                    addition[i]=letterSwapMap[addition[i].lower()]
+                elif len(addition)>2:
+                    if hashFeeder.feed():
+                        addition[i]=addition[i].upper()
+            word+="".join(addition)
+            
+        return word[:18]
 
 def generatePassword(hashFeeder,wordset,charactersets):
     password=""
