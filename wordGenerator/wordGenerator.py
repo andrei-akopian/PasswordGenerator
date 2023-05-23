@@ -16,7 +16,7 @@ def generateWord(hashFeeder,selectRandom,length):
             current_letter_type=hashFeeder.feed()
             if current_letter_type:
                 #double
-                if hashFeeder.feed() and len(word)>0:
+                if hashFeeder.feed() and len(word)>1:
                     word+=word[len(word)-1]
                 #new
                 else:
